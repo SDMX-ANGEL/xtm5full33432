@@ -42,6 +42,20 @@
   .tab:hover{color:var(--text);}
   .tab.active{background:var(--panel-2);color:var(--text);}
 
+  /* ---------- loader ---------- */
+  .loader{display:flex;gap:8px;padding-top:20px;}
+  .loader input{flex:1;background:var(--panel);border:1px solid var(--line);
+    color:var(--text);padding:11px 14px;border-radius:6px;font-size:14px;
+    font-family:inherit;min-width:0;}
+  .loader input::placeholder{color:var(--text-dim);}
+  .loader input:focus{outline:none;border-color:var(--gold);}
+  .loader button{background:var(--gold);border:none;color:#221c12;font-weight:500;
+    padding:0 20px;border-radius:6px;cursor:pointer;font-size:14px;white-space:nowrap;}
+  .loader button:hover{opacity:.9;}
+  @media(max-width:520px){
+    .loader{flex-direction:column;}
+  }
+
   /* ---------- player ---------- */
   .player-col{padding-top:22px;}
   .player-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#000;
@@ -126,6 +140,11 @@
       <button class="tab" data-tab="canales">Canales</button>
     </nav>
   </header>
+
+  <section class="loader">
+    <input type="text" id="m3uInput" placeholder="Pegá acá el link de tu lista .m3u o .m3u8">
+    <button id="loadBtn">Cargar lista</button>
+  </section>
 
   <section class="player-col">
     <div class="player-wrap">
@@ -386,33 +405,63 @@ document.querySelectorAll("[data-goto]").forEach(btn => {
 
 /* =========================================================================
    CARGA DE LA PLAYLIST
+   Se puede cargar desde el link pegado en el campo de arriba (se guarda en
+   este navegador para la próxima visita), o si no hay ninguno guardado,
+   desde el archivo local PLAYLIST_URL.
    ========================================================================= */
-fetch(PLAYLIST_URL)
-  .then(res => {
-    if(!res.ok) throw new Error("HTTP " + res.status);
-    return res.text();
-  })
-  .then(text => {
-    const items = parseM3U(text);
-    movies = items.filter(i => isMovieGroup(i.group));
-    channels = items.filter(i => !isMovieGroup(i.group));
+const m3uInput = document.getElementById("m3uInput");
+const loadBtn = document.getElementById("loadBtn");
 
-    fillGrid(document.getElementById("allMovies"), movies);
-    fillChannels(document.getElementById("allChannels"), channels);
-    fillGrid(document.getElementById("homeMovies"), movies.slice(0, 6));
-    fillChannels(document.getElementById("homeChannels"), channels.slice(0, 6));
+function loadPlaylist(url){
+  statusEl.textContent = "Cargando " + url + "…";
+  statusEl.classList.remove("error");
 
-    statusEl.textContent = "";
-    if(items.length === 0){
-      statusEl.textContent = "La playlist está vacía.";
-    } else {
-      playItem(items[0]);
-    }
-  })
-  .catch(err => {
-    statusEl.textContent = "No se pudo cargar " + PLAYLIST_URL + " (" + err.message + "). Revisá que el archivo esté subido junto a este index.html.";
-    statusEl.classList.add("error");
-  });
+  fetch(url)
+    .then(res => {
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      return res.text();
+    })
+    .then(text => {
+      const items = parseM3U(text);
+      movies = items.filter(i => isMovieGroup(i.group));
+      channels = items.filter(i => !isMovieGroup(i.group));
+
+      fillGrid(document.getElementById("allMovies"), movies);
+      fillChannels(document.getElementById("allChannels"), channels);
+      fillGrid(document.getElementById("homeMovies"), movies.slice(0, 6));
+      fillChannels(document.getElementById("homeChannels"), channels.slice(0, 6));
+
+      statusEl.textContent = "";
+      if(items.length === 0){
+        statusEl.textContent = "Esa lista llegó vacía o no se pudo leer.";
+        statusEl.classList.add("error");
+      } else {
+        playItem(items[0]);
+      }
+    })
+    .catch(err => {
+      statusEl.textContent = "No se pudo cargar esa lista (" + err.message + "). Si el link es de otro sitio (no de este mismo repo), puede que ese servidor no permita cargarla desde acá (bloqueo CORS) — probá abriendo el link directo en el navegador para confirmar que funciona.";
+      statusEl.classList.add("error");
+    });
+}
+
+loadBtn.addEventListener("click", () => {
+  const url = m3uInput.value.trim();
+  if(!url) return;
+  localStorage.setItem("lastM3uUrl", url);
+  loadPlaylist(url);
+});
+m3uInput.addEventListener("keydown", e => {
+  if(e.key === "Enter") loadBtn.click();
+});
+
+const savedUrl = localStorage.getItem("lastM3uUrl");
+if(savedUrl){
+  m3uInput.value = savedUrl;
+  loadPlaylist(savedUrl);
+} else {
+  loadPlaylist(PLAYLIST_URL);
+}
 </script>
 </body>
 </html>
