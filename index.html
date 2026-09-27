@@ -42,20 +42,6 @@
   .tab:hover{color:var(--text);}
   .tab.active{background:var(--panel-2);color:var(--text);}
 
-  /* ---------- loader ---------- */
-  .loader{display:flex;gap:8px;padding-top:20px;}
-  .loader input{flex:1;background:var(--panel);border:1px solid var(--line);
-    color:var(--text);padding:11px 14px;border-radius:6px;font-size:14px;
-    font-family:inherit;min-width:0;}
-  .loader input::placeholder{color:var(--text-dim);}
-  .loader input:focus{outline:none;border-color:var(--gold);}
-  .loader button{background:var(--gold);border:none;color:#221c12;font-weight:500;
-    padding:0 20px;border-radius:6px;cursor:pointer;font-size:14px;white-space:nowrap;}
-  .loader button:hover{opacity:.9;}
-  @media(max-width:520px){
-    .loader{flex-direction:column;}
-  }
-
   /* ---------- player ---------- */
   .player-col{padding-top:22px;}
   .player-wrap{position:relative;width:100%;aspect-ratio:16/9;background:#000;
@@ -141,16 +127,11 @@
     </nav>
   </header>
 
-  <section class="loader">
-    <input type="text" id="m3uInput" placeholder="Pegá acá el link de tu lista .m3u o .m3u8">
-    <button id="loadBtn">Cargar lista</button>
-  </section>
-
   <section class="player-col">
     <div class="player-wrap">
       <video id="player" controls playsinline></video>
       <div class="fallback" id="fallback" hidden>
-        <p>Este navegador no pudo reproducir el archivo (puede ser un problema de formato o de códec).</p>
+        <p>Este navegador no pudo reproducir el archivo (puede ser un problema de formato o de CORS).</p>
         <a id="fallbackLink" href="#" target="_blank" rel="noopener">Abrir el archivo original en una pestaña nueva</a>
       </div>
     </div>
@@ -195,21 +176,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.15/hls.min.js"></script>
 <script>
-/* =========================================================================
-   CONFIG
-   Dónde está la playlist. Por defecto busca "playlist.m3u" al lado de este
-   index.html, en el mismo repositorio. Si preferís apuntarla a una URL
-   externa (por ejemplo un link público de tu Nextcloud), reemplazá el
-   valor de abajo por esa URL completa.
-   ========================================================================= */
 const PLAYLIST_URL = "playlist.m3u";
 
-/* =========================================================================
-   PARSER M3U
-   Soporta el atributo group-title="Películas" en la línea #EXTINF para
-   clasificar cada video. Cualquier item sin group-title, o con un
-   group-title que no diga "película/movie/film", cae en Canales.
-   ========================================================================= */
 function normalize(s){
   return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -246,7 +214,6 @@ function isMovieGroup(group){
   return g.includes("pelicula") || g.includes("movie") || g.includes("film");
 }
 
-/* deterministic accent color per title, just for the poster placeholder */
 function colorFor(title){
   let hash = 0;
   for(let i = 0; i < title.length; i++) hash = title.charCodeAt(i) + ((hash << 5) - hash);
@@ -254,9 +221,6 @@ function colorFor(title){
   return `hsl(${hue} 38% 16%)`;
 }
 
-/* =========================================================================
-   ESTADO Y REPRODUCCIÓN
-   ========================================================================= */
 const video = document.getElementById("player");
 const fallback = document.getElementById("fallback");
 const fallbackLink = document.getElementById("fallbackLink");
@@ -269,8 +233,8 @@ const nextBtn = document.getElementById("nextBtn");
 let movies = [];
 let channels = [];
 let hls = null;
-let current = null;      // item actualmente reproduciendo
-let currentList = [];    // la lista (movies o channels) a la que pertenece
+let current = null;
+let currentList = [];
 
 function isHlsUrl(url){
   return /\.m3u8($|\?)/i.test(url);
@@ -289,25 +253,44 @@ function playItem(item){
 
   if(hls){ hls.destroy(); hls = null; }
 
+  // ----- AQUÍ ESTÁ LA MAGIA DEL PROXY CORS -----
+  let streamUrl = item.url;
+  
   if(isHlsUrl(item.url)){
+    // Usamos corsproxy.io para envolver la URL y evitar el bloqueo de CORS
+    streamUrl = "https://corsproxy.io/?" + encodeURIComponent(item.url);
+    
     if(window.Hls && Hls.isSupported()){
       hls = new Hls();
-      hls.loadSource(item.url);
+      hls.loadSource(streamUrl);
       hls.attachMedia(video);
+      
+      // ----- AQUÍ ESTÁ EL EVENTO QUE COMPARTISTE -----
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(() => {});
+      });
+
       hls.on(Hls.Events.ERROR, (_e, data) => {
-        if(data.fatal) showFallback(item);
+        if(data.fatal) {
+            console.error("Error fatal HLS:", data);
+            showFallback(item);
+        }
       });
     } else if(video.canPlayType("application/vnd.apple.mpegurl")){
-      video.src = item.url;
+      // Soporte nativo (Safari en iOS/Mac)
+      video.src = streamUrl;
+      video.addEventListener('loadedmetadata', () => {
+         video.play().catch(() => {});
+      });
     } else {
       showFallback(item);
       return;
     }
   } else {
+    // Si no es un m3u8 (por ejemplo un .mp4 directo)
     video.src = item.url;
+    video.play().catch(() => {});
   }
-
-  video.play().catch(() => {});
 
   prevBtn.disabled = currentList.length < 2;
   nextBtn.disabled = currentList.length < 2;
@@ -338,9 +321,6 @@ function refreshActiveStates(){
   });
 }
 
-/* =========================================================================
-   RENDER
-   ========================================================================= */
 function renderMovieCard(item){
   const btn = document.createElement("button");
   btn.className = "card";
@@ -385,9 +365,6 @@ function fillChannels(container, items){
   items.forEach((item, i) => container.appendChild(renderChannelRow(item, i + 1)));
 }
 
-/* =========================================================================
-   TABS
-   ========================================================================= */
 const tabs = document.querySelectorAll(".tab");
 const panels = {
   inicio: document.getElementById("panel-inicio"),
@@ -403,65 +380,32 @@ document.querySelectorAll("[data-goto]").forEach(btn => {
   btn.addEventListener("click", () => goToTab(btn.dataset.goto));
 });
 
-/* =========================================================================
-   CARGA DE LA PLAYLIST
-   Se puede cargar desde el link pegado en el campo de arriba (se guarda en
-   este navegador para la próxima visita), o si no hay ninguno guardado,
-   desde el archivo local PLAYLIST_URL.
-   ========================================================================= */
-const m3uInput = document.getElementById("m3uInput");
-const loadBtn = document.getElementById("loadBtn");
+fetch(PLAYLIST_URL)
+  .then(res => {
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    return res.text();
+  })
+  .then(text => {
+    const items = parseM3U(text);
+    movies = items.filter(i => isMovieGroup(i.group));
+    channels = items.filter(i => !isMovieGroup(i.group));
 
-function loadPlaylist(url){
-  statusEl.textContent = "Cargando " + url + "…";
-  statusEl.classList.remove("error");
+    fillGrid(document.getElementById("allMovies"), movies);
+    fillChannels(document.getElementById("allChannels"), channels);
+    fillGrid(document.getElementById("homeMovies"), movies.slice(0, 6));
+    fillChannels(document.getElementById("homeChannels"), channels.slice(0, 6));
 
-  fetch(url)
-    .then(res => {
-      if(!res.ok) throw new Error("HTTP " + res.status);
-      return res.text();
-    })
-    .then(text => {
-      const items = parseM3U(text);
-      movies = items.filter(i => isMovieGroup(i.group));
-      channels = items.filter(i => !isMovieGroup(i.group));
-
-      fillGrid(document.getElementById("allMovies"), movies);
-      fillChannels(document.getElementById("allChannels"), channels);
-      fillGrid(document.getElementById("homeMovies"), movies.slice(0, 6));
-      fillChannels(document.getElementById("homeChannels"), channels.slice(0, 6));
-
-      statusEl.textContent = "";
-      if(items.length === 0){
-        statusEl.textContent = "Esa lista llegó vacía o no se pudo leer.";
-        statusEl.classList.add("error");
-      } else {
-        playItem(items[0]);
-      }
-    })
-    .catch(err => {
-      statusEl.textContent = "No se pudo cargar esa lista (" + err.message + "). Si el link es de otro sitio (no de este mismo repo), puede que ese servidor no permita cargarla desde acá (bloqueo CORS) — probá abriendo el link directo en el navegador para confirmar que funciona.";
-      statusEl.classList.add("error");
-    });
-}
-
-loadBtn.addEventListener("click", () => {
-  const url = m3uInput.value.trim();
-  if(!url) return;
-  localStorage.setItem("lastM3uUrl", url);
-  loadPlaylist(url);
-});
-m3uInput.addEventListener("keydown", e => {
-  if(e.key === "Enter") loadBtn.click();
-});
-
-const savedUrl = localStorage.getItem("lastM3uUrl");
-if(savedUrl){
-  m3uInput.value = savedUrl;
-  loadPlaylist(savedUrl);
-} else {
-  loadPlaylist(PLAYLIST_URL);
-}
+    statusEl.textContent = "";
+    if(items.length === 0){
+      statusEl.textContent = "La playlist está vacía.";
+    } else {
+      playItem(items[0]);
+    }
+  })
+  .catch(err => {
+    statusEl.textContent = "No se pudo cargar " + PLAYLIST_URL + " (" + err.message + "). Revisá que el archivo esté subido junto a este index.html.";
+    statusEl.classList.add("error");
+  });
 </script>
 </body>
 </html>
