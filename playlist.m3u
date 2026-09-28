@@ -1,9 +1,25 @@
 #EXTM3U
-#EXTINF:-1 group-title="Películas",aver
+#EXTINF:-1 tvg-id="" tvg-name="Larva" tvg-logo="https://image.tmdb.org/t/p/w600_and_h900_bestv2/7JspmokDnpm8SEg28wtstfGps0K.jpg" group-title="VOD-INFANTILES",Larva
 https://ia600107.us.archive.org/19/items/s-01-e-01-episode-1-larva/S01E01%20-%20Episode%201%20Larva.mp4
-#EXTINF:-1 group-title="Películas",Servicio Domingo 19 de enero
-https://ia600107.us.archive.org/19/items/s-01-e-01-episode-1-larva/S01E01%20-%20Episode%201%20Larva.mp4
-#EXTINF:-1 group-title="Canales",Estudio bíblico
-https://ia600107.us.archive.org/19/items/s-01-e-01-episode-1-larva/S01E01%20-%20Episode%201%20Larva.mp4
-#EXTINF:-1 group-title="Canales",Alabanza en vivo
-https://ia600107.us.archive.org/19/items/s-01-e-01-episode-1-larva/S01E01%20-%20Episode%201%20Larva.mp4
+#EXTINF:-1 tvg-id="NIKLAM" tvg-name="Nickelodeon Clasico" tvg-logo="https://i.imgur.com/Fm9Q29U.jpeg" group-title="TV-INFANTILES",Nickelodeon Clasico
+https://jmp2.uk/plu-6824cda00101510f9eeaa011.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="Bob Esponja" tvg-logo="https://i.imgur.com/FUXI1rz.jpeg" group-title="TV-INFANTILES",Bob Esponja
+https://jmp2.uk/plu-6254598f5083f800076d8563.m3u8
+#EXTINF:-1 tvg-id="" tvg-name="Las Tortugas Ninja" tvg-logo="https://i.imgur.com/TpJH7h6.jpeg" group-title="TV-INFANTILES",Las Tortugas Ninja
+https://jmp2.uk/plu-63dd5d7a4e83e700088fbca8.m3u8
+#EXTINF:-1 tvg-id="NIKLAM" tvg-name="Nickelodeon iCarly" tvg-logo="https://i.imgur.com/HEEGWtX.jpeg" group-title="TV-INFANTILES",Nickelodeon iCarly
+https://jmp2.uk/plu-620ff0a01f9e8700076c6f9d.m3u8
+#EXTINF:-1 tvg-id="NIKLAM" tvg-name="Los Padrinos Mágicos" tvg-logo="https://i.imgur.com/01WCwUu.jpeg" group-title="TV-INFANTILES",Los Padrinos Mágicos
+https://jmp2.uk/plu-6322099c822bbc00074857db.m3u8
+#EXTINF:-1 tvg-id="NIKLAM" tvg-name="Los Pitufos" tvg-logo="https://i.imgur.com/ArJp8gC.jpeg" group-title="TV-INFANTILES",Los Pitufos
+https://jmp2.uk/plu-68a3a97fd8f7693ae3f8575f.m3u8
+#EXTINF:-1 tvg-id="AnimeStation" tvg-logo="https://i.imgur.com/ob2MdvC.png" group-title="TV-INFANTILES",AnimeStation
+https://live20.bozztv.com/akamaissh101/ssh101/livestreamingtv/chunks.m3u8
+#EXTINF:-1 tvg-id="NIKLAM" tvg-name="Popeye y su Hijo" tvg-logo="https://i.imgur.com/N9OQlDf.jpeg" group-title="TV-INFANTILES",Popeye y su Hijo
+https://jmp2.uk/plu-677d93afe650a700081e5f18.m3u8
+#EXTINF:-1 tvg-id="NIKLAM" tvg-name="Nickelodeon Toons" tvg-logo="https://i.imgur.com/bgEHJVc.jpeg" group-title="TV-INFANTILES",Nickelodeon Toons
+https://jmp2.uk/plu-645952687cb4b100084ed52e.m3u8
+#EXTINF:-1 tvg-id="ANIME" tvg-name="Yu-Gi-Oh! GX" tvg-logo="https://i.imgur.com/kTEo3Zc.jpeg" group-title="TV-INFANTILES",Yu-Gi-Oh! GX
+https://jmp2.uk/plu-5fceaab478f2af00080ff51f.m3u8
+#EXTINF:-1 tvg-id="ANIME" tvg-name="Death Note" tvg-logo="https://i.imgur.com/m9BoYB1.png" group-title="TV-INFANTILES",Death Note
+https://jmp2.uk/plu-626c2ed933a2890007e91422.m3u8
