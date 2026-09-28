@@ -164,11 +164,26 @@ function playItem(item){
       
       hls = new Hls({
         xhrSetup: function(xhr, url) {
-          let cleanUrl = url;
-          if (cleanUrl.includes('/proxy?url=')) {
-            cleanUrl = decodeURIComponent(cleanUrl.split('/proxy?url=')[1]);
+          let targetUrl = url;
+          
+          // Si la URL es relativa o viene mal anidada, la resolvemos contra la URL base del item
+          if (!targetUrl.startsWith('http')) {
+            try {
+              targetUrl = new URL(targetUrl, item.url).href;
+            } catch (e) {
+              targetUrl = item.url;
+            }
           }
-          xhr.open('GET', PROXY_URL + encodeURIComponent(cleanUrl), true);
+          
+          // Limpiamos si por alguna razón ya traía el proxy pegado
+          if (targetUrl.includes('/proxy?url=')) {
+            try {
+              const parts = targetUrl.split('/proxy?url=');
+              targetUrl = decodeURIComponent(parts[parts.length - 1]);
+            } catch (e) {}
+          }
+          
+          xhr.open('GET', PROXY_URL + encodeURIComponent(targetUrl), true);
         }
       });
       
