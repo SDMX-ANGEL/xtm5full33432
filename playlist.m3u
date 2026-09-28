@@ -1,6 +1,4 @@
 #EXTM3U
-#EXTINF:-1 tvg-id="" tvg-name="Larva" tvg-logo="https://image.tmdb.org/t/p/w600_and_h900_bestv2/7JspmokDnpm8SEg28wtstfGps0K.jpg" group-title="VOD-INFANTILES",Larva
-https://ia600107.us.archive.org/19/items/s-01-e-01-episode-1-larva/S01E01%20-%20Episode%201%20Larva.mp4
 #EXTINF:-1 tvg-id="NIKLAM" tvg-name="Nickelodeon Clasico" tvg-logo="https://i.imgur.com/Fm9Q29U.jpeg" group-title="TV-INFANTILES",Nickelodeon Clasico
 https://jmp2.uk/plu-6824cda00101510f9eeaa011.m3u8
 #EXTINF:-1 tvg-id="" tvg-name="Bob Esponja" tvg-logo="https://i.imgur.com/FUXI1rz.jpeg" group-title="TV-INFANTILES",Bob Esponja
@@ -23,3 +21,23 @@ https://jmp2.uk/plu-645952687cb4b100084ed52e.m3u8
 https://jmp2.uk/plu-5fceaab478f2af00080ff51f.m3u8
 #EXTINF:-1 tvg-id="ANIME" tvg-name="Death Note" tvg-logo="https://i.imgur.com/m9BoYB1.png" group-title="TV-INFANTILES",Death Note
 https://jmp2.uk/plu-626c2ed933a2890007e91422.m3u8
+#EXTINF:-1 tvg-id="NIKLAM" tvg-name="Rugrats" tvg-logo="https://i.imgur.com/mJ1q9uA.jpeg" group-title="TV-INFANTILES",Rugrats
+https://jmp2.uk/plu-5ea7215005d66d0007e8128a.m3u8
+#EXTINF:-1 tvg-id="NIKLAM" tvg-name="Pokémon" tvg-logo="https://i.imgur.com/3058Trp.jpeg" group-title="TV-INFANTILES",Pokémon
+https://jmp2.uk/plu-6870072ca9d5c45c3e9466f1.m3u8
+#EXTINF:-1 tvg-id="CANALES TV" tvg-name="Vete a la Versh" tvg-logo="https://i.imgur.com/9kxWKBg.jpeg" group-title="TV-INFANTILES",Vete a la Versh
+https://jmp2.uk/plu-5e8397936791b30007ebb5a7.m3u8
+#EXTINF:-1 tvg-id="CANALES TV" tvg-Naruto" tvg-logo="https://i.imgur.com/5E45lPK.jpeg" group-title="TV-INFANTILES",Naruto
+https://jmp2.uk/plu-5ee92e72fb286e0007285fec.m3u8
+#EXTINF:-1 tvg-id="NIKLAM" tvg-name="Avatar: La Leyenda de Aang" tvg-logo="https://i.imgur.com/xR76s36.png" group-title="TV-INFANTILES",Avatar: La Leyenda de Aang
+https://jmp2.uk/plu-6759ee82bd523200083b4f0f.m3u8
+#EXTINF:-1 tvg-id="TV-ENTRETIMIENTO" tvg-name="Empeños a lo bestia" tvg-logo="https://i.imgur.com/QRbLAN3.png" group-title="TV-ENTRETIMIENTO",Empeños a lo bestia
+https://jmp2.uk/plu-5f23102d5e239d00074b092a.m3u8
+#EXTINF:-1 tvg-id="TV-ENTRETIMIENTO" tvg-name="Obsesión por los Autos" tvg-logo="https://i.imgur.com/h6gQvrb.png" group-title="TV-ENTRETIMIENTO",Obsesión por los Autos
+https://jmp2.uk/plu-64025592953da40008bf9238.m3u8
+#EXTINF:-1 tvg-id="TV-ENTRETIMIENTO" tvg-name="TV Naturaleza" tvg-logo="https://i.imgur.com/88EzQji.png" group-title="TV-ENTRETIMIENTO",TV Naturaleza
+https://jmp2.uk/plu-5dd85eac039bba0009e86d1d.m3u8
+#EXTINF:-1 tvg-id="TV-ENTRETIMIENTO" tvg-name="TV Velocidad" tvg-logo="https://i.imgur.com/JVdbj4m.png" group-title="TV-ENTRETIMIENTO",TV Velocidad
+https://jmp2.uk/plu-5dd6dc7480e3550009133d4a.m3u8
+#EXTINF:-1 tvg-id="Comida" tvg-name="MasterChef Mexico" tvg-logo="https://i.imgur.com/O6djjaS.jpeg" group-title="Comida",MasterChef Mexico
+https://live-manifest.production-public.tubi.io/live/7935fa0e-5031-4a7f-86d5-0653e72a0540/playlist.m3u8
