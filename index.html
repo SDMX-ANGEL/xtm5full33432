@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <title>Cineteca</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
@@ -20,6 +21,12 @@
     --marquee: #b04632;
   }
   *{box-sizing:border-box;}
+  
+  /* --- CORRECCIÓN: Fuerza a ocultar elementos con el atributo hidden --- */
+  [hidden] {
+    display: none !important;
+  }
+
   html,body{margin:0;background:var(--bg);color:var(--text);height:100%;
     font-family:'Space Grotesk',system-ui,sans-serif;}
   h1,h2,h3{font-family:'Fraunces',serif;font-weight:500;margin:0;}
@@ -253,11 +260,9 @@ function playItem(item){
 
   if(hls){ hls.destroy(); hls = null; }
 
-  // ----- AQUÍ ESTÁ LA MAGIA DEL PROXY CORS -----
   let streamUrl = item.url;
   
   if(isHlsUrl(item.url)){
-    // Usamos corsproxy.io para envolver la URL y evitar el bloqueo de CORS
     streamUrl = "https://corsproxy.io/?" + encodeURIComponent(item.url);
     
     if(window.Hls && Hls.isSupported()){
@@ -265,7 +270,6 @@ function playItem(item){
       hls.loadSource(streamUrl);
       hls.attachMedia(video);
       
-      // ----- AQUÍ ESTÁ EL EVENTO QUE COMPARTISTE -----
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         video.play().catch(() => {});
       });
@@ -277,7 +281,6 @@ function playItem(item){
         }
       });
     } else if(video.canPlayType("application/vnd.apple.mpegurl")){
-      // Soporte nativo (Safari en iOS/Mac)
       video.src = streamUrl;
       video.addEventListener('loadedmetadata', () => {
          video.play().catch(() => {});
@@ -287,7 +290,6 @@ function playItem(item){
       return;
     }
   } else {
-    // Si no es un m3u8 (por ejemplo un .mp4 directo)
     video.src = item.url;
     video.play().catch(() => {});
   }
