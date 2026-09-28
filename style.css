@@ -13,7 +13,6 @@
   box-sizing: border-box;
 }
 
-/* Fuerza a ocultar elementos con el atributo hidden */
 [hidden] {
   display: none !important;
 }
@@ -46,7 +45,6 @@ a {
   padding: 0 20px 60px;
 }
 
-/* ---------- header ---------- */
 .topbar {
   padding: 26px 0 18px;
   border-bottom: 1px solid var(--line);
@@ -98,7 +96,6 @@ a {
   color: var(--text);
 }
 
-/* ---------- player ---------- */
 .player-col {
   padding-top: 22px;
 }
@@ -205,7 +202,6 @@ video {
   color: var(--marquee);
 }
 
-/* ---------- sections ---------- */
 .panel {
   padding-top: 30px;
 }
@@ -239,7 +235,6 @@ video {
   padding: 10px 2px;
 }
 
-/* movie grid */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -266,8 +261,17 @@ video {
   overflow: hidden;
 }
 
+.poster img.poster-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .poster .fmt {
   position: relative;
+  z-index: 1;
   font-size: 11px;
   color: rgba(236, 231, 220, .75);
   background: rgba(0, 0, 0, .6);
@@ -285,6 +289,7 @@ video {
   border-radius: 50%;
   background: var(--gold);
   display: none;
+  z-index: 1;
 }
 
 .card.is-playing .poster .play-dot {
@@ -306,7 +311,6 @@ video {
   color: var(--text);
 }
 
-/* channel list */
 .channels {
   display: flex;
   flex-direction: column;
