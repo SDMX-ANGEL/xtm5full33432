@@ -164,7 +164,11 @@ function playItem(item){
       
       hls = new Hls({
         xhrSetup: function(xhr, url) {
-          xhr.open('GET', PROXY_URL + encodeURIComponent(url), true);
+          let cleanUrl = url;
+          if (cleanUrl.includes('/proxy?url=')) {
+            cleanUrl = decodeURIComponent(cleanUrl.split('/proxy?url=')[1]);
+          }
+          xhr.open('GET', PROXY_URL + encodeURIComponent(cleanUrl), true);
         }
       });
       
