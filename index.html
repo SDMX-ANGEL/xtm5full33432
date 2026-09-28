@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
 <title>Cineteca</title>
 <link rel="icon" href="favicon.ico" type="image/x-icon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
-<!-- Aquí vinculamos el archivo CSS externo -->
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -74,13 +74,34 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.15/hls.min.js"></script>
 <script>
 const PLAYLIST_URL = "playlist.m3u";
+const PROXY_URL = "https://proxy-iptv-angel.onrender.com/proxy?url=";
 
 function normalize(s){
   return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
+function unwrapProxy(url){
+  let current = url || "";
+  for(let i = 0; i < 8; i++){
+    const match = current.match(/\/(?:api\/)?proxy\?url=([^&]+)/i);
+    if(!match) break;
+    try {
+      const next = decodeURIComponent(match[1]);
+      if(next === current) break;
+      current = next;
+    } catch(e){
+      break;
+    }
+  }
+  return current;
+}
+
+function proxied(url){
+  return PROXY_URL + encodeURIComponent(unwrapProxy(url));
+}
+
 function parseM3U(text){
-  const lines = text.split(/\r?\n/);
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/);
   const items = [];
   let pending = null;
   for(const raw of lines){
@@ -91,10 +112,10 @@ function parseM3U(text){
       const logoMatch = line.match(/tvg-logo="([^"]*)"/i);
       const comma = line.lastIndexOf(",");
       const title = comma !== -1 ? line.slice(comma + 1).trim() : "Sin título";
-      pending = { 
-        title, 
+      pending = {
+        title,
         group: groupMatch ? groupMatch[1].trim() : "",
-        logo: logoMatch ? logoMatch[1].trim() : "" 
+        logo: logoMatch ? logoMatch[1].trim() : ""
       };
     } else if(!line.startsWith("#")){
       const clean = line.split("?")[0];
@@ -112,9 +133,12 @@ function parseM3U(text){
   return items;
 }
 
-function isMovieGroup(group){
+function isMovieGroup(group, ext){
   const g = normalize(group);
-  return g.includes("pelicula") || g.includes("movie") || g.includes("film");
+  if(g.includes("pelicula") || g.includes("movie") || g.includes("film") || g.includes("vod")){
+    return true;
+  }
+  return ["mp4", "mkv", "avi", "webm", "mov", "m4v"].includes((ext || "").toLowerCase());
 }
 
 function colorFor(title){
@@ -140,15 +164,14 @@ let current = null;
 let currentList = [];
 
 function isHlsUrl(url){
-  // Expandido para intentar capturar también otras extensiones de flujo si es necesario
-  return /\.m3u8($|\?)/i.test(url);
+  return /\.m3u8($|\?)/i.test(unwrapProxy(url));
 }
 
 function playItem(item){
   current = item;
-  currentList = isMovieGroup(item.group) ? movies : channels;
+  currentList = isMovieGroup(item.group, item.ext) ? movies : channels;
 
-  npGroup.textContent = isMovieGroup(item.group) ? "Película" : (item.group || "Canal");
+  npGroup.textContent = isMovieGroup(item.group, item.ext) ? "Película" : (item.group || "Canal");
   npTitle.textContent = item.title;
   fallback.hidden = true;
   video.hidden = false;
@@ -156,62 +179,41 @@ function playItem(item){
   statusEl.classList.remove("error");
 
   if(hls){ hls.destroy(); hls = null; }
-  
-  // Lógica de reproducción con tu proxy privado de Render
+  video.removeAttribute("src");
+
+  const src = proxied(item.url);
+
   if(isHlsUrl(item.url)){
     if(window.Hls && Hls.isSupported()){
-      const PROXY_URL = "https://proxy-iptv-angel.onrender.com/proxy?url=";
-      
+      // El proxy ya reescribe el m3u8 (variantes, .ts y claves).
+      // NO uses xhrSetup: eso volvía a envolver URLs relativas contra el propio Render.
       hls = new Hls({
-        xhrSetup: function(xhr, url) {
-          let targetUrl = url;
-          
-          // Si la URL es relativa o viene mal anidada, la resolvemos contra la URL base del item
-          if (!targetUrl.startsWith('http')) {
-            try {
-              targetUrl = new URL(targetUrl, item.url).href;
-            } catch (e) {
-              targetUrl = item.url;
-            }
-          }
-          
-          // Limpiamos si por alguna razón ya traía el proxy pegado
-          if (targetUrl.includes('/proxy?url=')) {
-            try {
-              const parts = targetUrl.split('/proxy?url=');
-              targetUrl = decodeURIComponent(parts[parts.length - 1]);
-            } catch (e) {}
-          }
-          
-          xhr.open('GET', PROXY_URL + encodeURIComponent(targetUrl), true);
-        }
+        enableWorker: true,
+        lowLatencyMode: false,
+        maxBufferLength: 30
       });
-      
-      hls.loadSource(item.url);
+      hls.loadSource(src);
       hls.attachMedia(video);
-      
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         video.play().catch(() => {});
       });
-
       hls.on(Hls.Events.ERROR, (_e, data) => {
-        if(data.fatal) {
-            console.error("Error fatal HLS:", data);
-            showFallback(item);
+        if(data.fatal){
+          console.error("Error fatal HLS:", data);
+          showFallback(item);
         }
       });
     } else if(video.canPlayType("application/vnd.apple.mpegurl")){
-      video.src = "https://proxy-iptv-angel.onrender.com/proxy?url=" + encodeURIComponent(item.url);
-      video.addEventListener('loadedmetadata', () => {
-         video.play().catch(() => {});
-      });
+      video.src = src;
+      video.addEventListener("loadedmetadata", () => {
+        video.play().catch(() => {});
+      }, { once: true });
     } else {
       showFallback(item);
       return;
     }
   } else {
-    // Archivos directos (mp4, etc.)
-    video.src = item.url;
+    video.src = src;
     video.play().catch(() => {});
   }
 
@@ -248,17 +250,34 @@ function renderMovieCard(item){
   const btn = document.createElement("button");
   btn.className = "card";
   btn.dataset.url = item.url;
-  
-  const bgStyle = item.logo 
-    ? `background: url('${item.logo}') center/cover no-repeat;` 
-    : `background:${colorFor(item.title)}`;
 
-  btn.innerHTML = `
-    <div class="poster" style="${bgStyle}">
-      <span class="play-dot"></span>
-      <span class="fmt">${item.ext || "video"}</span>
-    </div>
-    <div class="card-title">${item.title}</div>`;
+  const poster = document.createElement("div");
+  poster.className = "poster";
+  if(item.logo && /^https?:/i.test(item.logo)){
+    const img = document.createElement("img");
+    img.className = "poster-img";
+    img.src = item.logo;
+    img.alt = "";
+    img.referrerPolicy = "no-referrer";
+    poster.appendChild(img);
+  } else {
+    poster.style.background = colorFor(item.title);
+  }
+
+  const playDot = document.createElement("span");
+  playDot.className = "play-dot";
+  const fmt = document.createElement("span");
+  fmt.className = "fmt";
+  fmt.textContent = item.ext || "video";
+  poster.appendChild(playDot);
+  poster.appendChild(fmt);
+
+  const title = document.createElement("div");
+  title.className = "card-title";
+  title.textContent = item.title;
+
+  btn.appendChild(poster);
+  btn.appendChild(title);
   btn.addEventListener("click", () => playItem(item));
   return btn;
 }
@@ -267,16 +286,29 @@ function renderChannelRow(item, number){
   const row = document.createElement("button");
   row.className = "channel-row";
   row.dataset.url = item.url;
-  
-  const logoHtml = item.logo 
-    ? `<img src="${item.logo}" style="width:32px; height:32px; border-radius:4px; object-fit:contain; flex-shrink:0;">` 
-    : ``;
 
-  row.innerHTML = `
-    <span class="ch-num">${String(number).padStart(2, "0")}</span>
-    ${logoHtml}
-    <span class="ch-title">${item.title}</span>
-    <span class="ch-fmt">${item.ext || "video"}</span>`;
+  const num = document.createElement("span");
+  num.className = "ch-num";
+  num.textContent = String(number).padStart(2, "0");
+  row.appendChild(num);
+
+  if(item.logo && /^https?:/i.test(item.logo)){
+    const img = document.createElement("img");
+    img.src = item.logo;
+    img.alt = "";
+    img.referrerPolicy = "no-referrer";
+    img.style.cssText = "width:32px;height:32px;border-radius:4px;object-fit:contain;flex-shrink:0;";
+    row.appendChild(img);
+  }
+
+  const title = document.createElement("span");
+  title.className = "ch-title";
+  title.textContent = item.title;
+  const fmt = document.createElement("span");
+  fmt.className = "ch-fmt";
+  fmt.textContent = item.ext || "video";
+  row.appendChild(title);
+  row.appendChild(fmt);
   row.addEventListener("click", () => playItem(item));
   return row;
 }
@@ -321,8 +353,8 @@ fetch(PLAYLIST_URL)
   })
   .then(text => {
     const items = parseM3U(text);
-    movies = items.filter(i => isMovieGroup(i.group));
-    channels = items.filter(i => !isMovieGroup(i.group));
+    movies = items.filter(i => isMovieGroup(i.group, i.ext));
+    channels = items.filter(i => !isMovieGroup(i.group, i.ext));
 
     fillGrid(document.getElementById("allMovies"), movies);
     fillChannels(document.getElementById("allChannels"), channels);
