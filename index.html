@@ -156,16 +156,19 @@ function playItem(item){
   statusEl.classList.remove("error");
 
   if(hls){ hls.destroy(); hls = null; }
-
-  let streamUrl = item.url;
   
-  // Lógica de reproducción: si es m3u8 usa HLS.js, de lo contrario carga nativo
+  // Lógica de reproducción con tu proxy privado de Render
   if(isHlsUrl(item.url)){
-    streamUrl = "https://corsproxy.io/?" + encodeURIComponent(item.url);
-    
     if(window.Hls && Hls.isSupported()){
-      hls = new Hls();
-      hls.loadSource(streamUrl);
+      const PROXY_URL = "https://proxy-iptv-angel.onrender.com/proxy?url=";
+      
+      hls = new Hls({
+        xhrSetup: function(xhr, url) {
+          xhr.open('GET', PROXY_URL + encodeURIComponent(url), true);
+        }
+      });
+      
+      hls.loadSource(item.url);
       hls.attachMedia(video);
       
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -179,7 +182,7 @@ function playItem(item){
         }
       });
     } else if(video.canPlayType("application/vnd.apple.mpegurl")){
-      video.src = streamUrl;
+      video.src = "https://proxy-iptv-angel.onrender.com/proxy?url=" + encodeURIComponent(item.url);
       video.addEventListener('loadedmetadata', () => {
          video.play().catch(() => {});
       });
@@ -188,8 +191,7 @@ function playItem(item){
       return;
     }
   } else {
-    // Archivos directos (mp4, webm). 
-    // Los MKV o AVI saltarán al fallback automáticamente por error nativo.
+    // Archivos directos (mp4, etc.)
     video.src = item.url;
     video.play().catch(() => {});
   }
