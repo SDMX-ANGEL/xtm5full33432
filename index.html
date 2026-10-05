@@ -2,74 +2,127 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<title>Cineteca</title>
+<meta name="theme-color" content="#050608">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SDMX Angel">
+<title>SDMX Angel</title>
 <link rel="icon" href="favicon.ico" type="image/x-icon">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="app">
 
-  <header class="topbar">
-    <div class="brand"><span>ci</span>neteca</div>
-    <nav class="tabs">
-      <button class="tab active" data-tab="inicio">Inicio</button>
-      <button class="tab" data-tab="peliculas">Películas</button>
-      <button class="tab" data-tab="canales">Canales</button>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="i-film" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.5"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></symbol>
+    <symbol id="i-tv" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-shrink" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></symbol>
+    <symbol id="i-pip" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2.5"/><rect x="12" y="12" width="7" height="5" rx="1" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark"><svg class="ico" aria-hidden="true"><use href="#i-play"/></svg></span>
+      <span class="brand-text"><strong>SDMX</strong><em>Angel</em></span>
+    </div>
+
+    <nav class="nav" aria-label="Secciones">
+      <button class="tab active" data-tab="inicio"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg><span>Inicio</span></button>
+      <button class="tab" data-tab="peliculas"><svg class="ico" aria-hidden="true"><use href="#i-film"/></svg><span>Películas</span></button>
+      <button class="tab" data-tab="canales"><svg class="ico" aria-hidden="true"><use href="#i-tv"/></svg><span>Canales</span></button>
     </nav>
-  </header>
 
-  <section class="player-col">
-    <div class="player-wrap">
-      <video id="player" controls playsinline></video>
-      <div class="fallback" id="fallback" hidden>
-        <p>Este navegador web no tiene los códecs para reproducir este formato directamente, o el servidor bloqueó la conexión.</p>
-        <a id="fallbackLink" href="#" target="_blank" rel="noopener">Abrir el archivo externamente o descargarlo</a>
+    <div class="now-card" id="nowCard">
+      <span class="now-label" id="sideLabel">Reproduciendo</span>
+      <span class="now-title" id="sideTitle">Nada por ahora</span>
+      <div class="now-bar" id="sideBar"><i id="sideFill"></i></div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header class="mobile-top">
+      <span class="brand-mark"><svg class="ico" aria-hidden="true"><use href="#i-play"/></svg></span>
+      <span class="brand-text"><strong>SDMX</strong><em>Angel</em></span>
+    </header>
+
+    <h1 class="page-title" id="pageTitle">Inicio</h1>
+
+    <section class="player-col">
+      <div class="player-wrap" id="playerWrap">
+        <video id="player" controls playsinline controlslist="nofullscreen"></video>
+        <div class="fallback" id="fallback" hidden>
+          <p>Este navegador web no tiene los códecs para reproducir este formato directamente, o el servidor bloqueó la conexión.</p>
+          <a id="fallbackLink" href="#" target="_blank" rel="noopener">Abrir el archivo externamente o descargarlo</a>
+        </div>
+        <div class="player-actions">
+          <button id="pipBtn" aria-label="Minimizar en ventana flotante" title="Minimizar en ventana flotante" hidden><svg class="ico" aria-hidden="true"><use href="#i-pip"/></svg></button>
+          <button id="fsBtn" aria-label="Pantalla completa" title="Pantalla completa">
+            <svg class="ico icon-enter" aria-hidden="true"><use href="#i-expand"/></svg>
+            <svg class="ico icon-exit" aria-hidden="true"><use href="#i-shrink"/></svg>
+          </button>
+        </div>
       </div>
-    </div>
-    <div class="player-meta">
-      <div>
-        <span class="np-group" id="npGroup">Videoteca</span>
-        <h2 class="np-title" id="npTitle">Elegí algo para reproducir</h2>
+      <div class="player-meta">
+        <div class="np-text">
+          <span class="np-group" id="npGroup">Videoteca</span>
+          <h2 class="np-title" id="npTitle">Elegí algo para reproducir</h2>
+        </div>
+        <div class="np-controls">
+          <button id="prevBtn" aria-label="Anterior" disabled><svg class="ico" aria-hidden="true"><use href="#i-prev"/></svg></button>
+          <button id="nextBtn" class="is-accent" aria-label="Siguiente" disabled><svg class="ico" aria-hidden="true"><use href="#i-next"/></svg></button>
+        </div>
       </div>
-      <div class="np-controls">
-        <button id="prevBtn" aria-label="Anterior" disabled>‹</button>
-        <button id="nextBtn" aria-label="Siguiente" disabled>›</button>
+      <p class="status" id="status">Cargando playlist.m3u…</p>
+    </section>
+
+    <section id="panel-inicio" class="panel">
+      <div class="panel-head">
+        <h2>Películas</h2>
+        <button class="see-all" data-goto="peliculas">Ver todas</button>
       </div>
-    </div>
-    <p class="status" id="status">Cargando playlist.m3u…</p>
-  </section>
+      <div class="grid" id="homeMovies"></div>
 
-  <section id="panel-inicio" class="panel">
-    <div class="panel-head">
-      <h2>Películas</h2>
-      <button class="see-all" data-goto="peliculas">Ver todas</button>
-    </div>
-    <div class="grid" id="homeMovies"></div>
+      <div class="panel-head panel-head-second">
+        <h2>Canales</h2>
+        <button class="see-all" data-goto="canales">Ver todos</button>
+      </div>
+      <div class="channels" id="homeChannels"></div>
+    </section>
 
-    <div class="panel-head" style="margin-top:34px;">
-      <h2>Canales</h2>
-      <button class="see-all" data-goto="canales">Ver todos</button>
-    </div>
-    <div class="channels" id="homeChannels"></div>
-  </section>
+    <section id="panel-peliculas" class="panel" hidden>
+      <div class="panel-head"><h2>Películas</h2></div>
+      <div class="grid" id="allMovies"></div>
+    </section>
 
-  <section id="panel-peliculas" class="panel" hidden>
-    <div class="panel-head"><h2>Películas</h2></div>
-    <div class="grid" id="allMovies"></div>
-  </section>
+    <section id="panel-canales" class="panel" hidden>
+      <div class="panel-head"><h2>Canales</h2></div>
+      <div class="channels" id="allChannels"></div>
+    </section>
 
-  <section id="panel-canales" class="panel" hidden>
-    <div class="panel-head"><h2>Canales</h2></div>
-    <div class="channels" id="allChannels"></div>
-  </section>
-
+  </main>
 </div>
+
+<nav class="bottombar" aria-label="Secciones">
+  <button class="tab active" data-tab="inicio"><svg class="ico" aria-hidden="true"><use href="#i-home"/></svg><span>Inicio</span></button>
+  <button class="tab" data-tab="peliculas"><svg class="ico" aria-hidden="true"><use href="#i-film"/></svg><span>Películas</span></button>
+  <button class="tab" data-tab="canales"><svg class="ico" aria-hidden="true"><use href="#i-tv"/></svg><span>Canales</span></button>
+</nav>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.15/hls.min.js"></script>
 <script>
@@ -156,6 +209,10 @@ const npGroup = document.getElementById("npGroup");
 const npTitle = document.getElementById("npTitle");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
+const sideLabel = document.getElementById("sideLabel");
+const sideTitle = document.getElementById("sideTitle");
+const sideBar = document.getElementById("sideBar");
+const sideFill = document.getElementById("sideFill");
 
 let movies = [];
 let channels = [];
@@ -171,8 +228,13 @@ function playItem(item){
   current = item;
   currentList = isMovieGroup(item.group, item.ext) ? movies : channels;
 
-  npGroup.textContent = isMovieGroup(item.group, item.ext) ? "Película" : (item.group || "Canal");
+  const isMovie = isMovieGroup(item.group, item.ext);
+  npGroup.textContent = isMovie ? "Película" : (item.group || "Canal");
   npTitle.textContent = item.title;
+  sideLabel.textContent = isMovie ? "Reproduciendo película" : "Reproduciendo canal";
+  sideTitle.textContent = item.title;
+  sideFill.style.width = "0%";
+  sideBar.classList.remove("live");
   fallback.hidden = true;
   video.hidden = false;
   statusEl.textContent = "";
@@ -221,6 +283,7 @@ function playItem(item){
   nextBtn.disabled = currentList.length < 2;
 
   refreshActiveStates();
+  showUi();
 }
 
 function showFallback(item){
@@ -230,6 +293,16 @@ function showFallback(item){
 }
 
 video.addEventListener("error", () => { if(current) showFallback(current); });
+
+video.addEventListener("timeupdate", () => {
+  if(isFinite(video.duration) && video.duration > 0){
+    sideBar.classList.remove("live");
+    sideFill.style.width = (video.currentTime / video.duration * 100) + "%";
+  } else if(current){
+    sideBar.classList.add("live");
+    sideFill.style.width = "100%";
+  }
+});
 
 prevBtn.addEventListener("click", () => step(-1));
 nextBtn.addEventListener("click", () => step(1));
@@ -258,6 +331,7 @@ function renderMovieCard(item){
     img.className = "poster-img";
     img.src = item.logo;
     img.alt = "";
+    img.loading = "lazy";
     img.referrerPolicy = "no-referrer";
     poster.appendChild(img);
   } else {
@@ -294,10 +368,11 @@ function renderChannelRow(item, number){
 
   if(item.logo && /^https?:/i.test(item.logo)){
     const img = document.createElement("img");
+    img.className = "ch-logo";
     img.src = item.logo;
     img.alt = "";
+    img.loading = "lazy";
     img.referrerPolicy = "no-referrer";
-    img.style.cssText = "width:32px;height:32px;border-radius:4px;object-fit:contain;flex-shrink:0;";
     row.appendChild(img);
   }
 
@@ -332,6 +407,8 @@ function fillChannels(container, items){
 }
 
 const tabs = document.querySelectorAll(".tab");
+const pageTitle = document.getElementById("pageTitle");
+const tabNames = { inicio: "Inicio", peliculas: "Películas", canales: "Canales" };
 const panels = {
   inicio: document.getElementById("panel-inicio"),
   peliculas: document.getElementById("panel-peliculas"),
@@ -340,11 +417,104 @@ const panels = {
 function goToTab(name){
   tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === name));
   Object.entries(panels).forEach(([key, el]) => { el.hidden = key !== name; });
+  pageTitle.textContent = tabNames[name] || "";
 }
 tabs.forEach(t => t.addEventListener("click", () => goToTab(t.dataset.tab)));
 document.querySelectorAll("[data-goto]").forEach(btn => {
   btn.addEventListener("click", () => goToTab(btn.dataset.goto));
 });
+
+/* ---------- Pantalla completa, minimizar y controles flotantes ---------- */
+
+const wrap = document.getElementById("playerWrap");
+const fsBtn = document.getElementById("fsBtn");
+const pipBtn = document.getElementById("pipBtn");
+
+function fsElement(){
+  return document.fullscreenElement || document.webkitFullscreenElement || null;
+}
+
+function toggleFullscreen(){
+  if(fsElement()){
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if(exit) exit.call(document);
+    return;
+  }
+  if(wrap.requestFullscreen){
+    wrap.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+  } else if(wrap.webkitRequestFullscreen){
+    wrap.webkitRequestFullscreen();
+  } else if(video.webkitEnterFullscreen){
+    // iPhone: solo permite pantalla completa nativa del video
+    video.webkitEnterFullscreen();
+  }
+}
+
+function onFullscreenChange(){
+  const on = !!fsElement();
+  wrap.classList.toggle("is-fs", on);
+  const label = on ? "Salir de pantalla completa" : "Pantalla completa";
+  fsBtn.setAttribute("aria-label", label);
+  fsBtn.title = label;
+  try {
+    if(on && screen.orientation && screen.orientation.lock){
+      screen.orientation.lock("landscape").catch(() => {});
+    } else if(!on && screen.orientation && screen.orientation.unlock){
+      screen.orientation.unlock();
+    }
+  } catch(e){}
+  showUi();
+}
+
+fsBtn.addEventListener("click", toggleFullscreen);
+video.addEventListener("dblclick", toggleFullscreen);
+document.addEventListener("fullscreenchange", onFullscreenChange);
+document.addEventListener("webkitfullscreenchange", onFullscreenChange);
+
+document.addEventListener("keydown", (e) => {
+  const tag = (e.target && e.target.tagName) || "";
+  if(/INPUT|TEXTAREA|SELECT/.test(tag)) return;
+  if(e.key === "f" || e.key === "F"){ toggleFullscreen(); }
+});
+
+function pipSupported(){
+  if(document.pictureInPictureEnabled && !video.disablePictureInPicture) return true;
+  return !!(video.webkitSupportsPresentationMode && video.webkitSupportsPresentationMode("picture-in-picture"));
+}
+
+function togglePip(){
+  if(document.pictureInPictureElement){
+    document.exitPictureInPicture().catch(() => {});
+  } else if(video.webkitPresentationMode === "picture-in-picture"){
+    video.webkitSetPresentationMode("inline");
+  } else if(video.requestPictureInPicture){
+    video.requestPictureInPicture().catch(() => {});
+  } else if(video.webkitSetPresentationMode){
+    video.webkitSetPresentationMode("picture-in-picture");
+  }
+}
+
+if(pipSupported()){
+  pipBtn.hidden = false;
+  pipBtn.addEventListener("click", togglePip);
+}
+
+let uiTimer = null;
+function showUi(){
+  wrap.classList.add("show-ui");
+  clearTimeout(uiTimer);
+  uiTimer = setTimeout(() => {
+    if(!video.paused) wrap.classList.remove("show-ui");
+  }, 2800);
+}
+["pointermove", "pointerdown", "touchstart", "keydown"].forEach(ev => {
+  wrap.addEventListener(ev, showUi, { passive: true });
+});
+video.addEventListener("pause", () => { wrap.classList.add("show-ui"); clearTimeout(uiTimer); });
+video.addEventListener("play", showUi);
+showUi();
+
+/* ---------- Carga de la playlist ---------- */
 
 fetch(PLAYLIST_URL)
   .then(res => {
